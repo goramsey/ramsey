@@ -76,11 +76,12 @@ func yyParsePooled(yylex yyLexer) int {
 // is the AST representation of the query. If a DDL statement
 // is partially parsed but still contains a syntax error, the
 // error is ignored and the DDL is returned anyway.
-func Parse(query string) (AST, error) {
+func Parse(query string) (ASTNode, error) {
 	tokenizer := NewScanner(strings.NewReader(query))
 	res := yyParse(tokenizer)
-	if res != 0 {
-		return nil, fmt.Errorf(tokenizer.err)
+	
+	if res != 0 || tokenizer.err != "" {
+		return nil, fmt.Errorf("parser failed: %s", tokenizer.err)
 	}
 	if tokenizer.ast == nil {
 		log.Printf("Empty Statement: %s", debug.Stack())

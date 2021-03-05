@@ -6,3 +6,5 @@ build:
 
 unit-test:
 	go test ./go/...
+	
+all: parser unit-test

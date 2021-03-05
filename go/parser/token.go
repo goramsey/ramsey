@@ -12,7 +12,7 @@ type (
 	Scanner struct {
 		r   *bufio.Reader
 		err string
-		ast AST
+		ast ASTNode
 	}
 
 	Token int
@@ -54,9 +54,9 @@ func (s *Scanner) Scan() (tok Token, lit string) {
 		s.unread()
 		return s.scanNumber()
 	case ch == eof:
-		return EOF, ""
-	case ch == '*':
-		return ASTERISK, string(ch)
+		return 0, ""
+	case ch == '+':
+		return PLUS, string(ch)
 	case ch == ',':
 		return COMMA, string(ch)
 	default:

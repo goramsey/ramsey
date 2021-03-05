@@ -2,12 +2,10 @@
 
 package parser
 
-import "fmt"
-
 var regs = make([]int, 26)
 var base int
 
-func setParseTree(yylex interface{}, result AST) {
+func setParseTree(yylex interface{}, result ASTNode) {
   yylex.(*Scanner).ast = result
 }
 
@@ -22,13 +20,13 @@ func setParseTree(yylex interface{}, result AST) {
 
 // any non-terminal which returns a value needs a type, which is
 // really a field name in the above union struct
-%type <expr> expr
+%type <expr> expr expr1
 
 // same for terminals
-%token LEX_ERROR EOF ASTERISK COMMA ILLEGAL IDENT
+%token LEX_ERROR EOF PLUS COMMA ILLEGAL 
 %token RETURN WS
 
-%token <bytes> DIGIT LETTER
+%token <bytes> DIGIT IDENT
 
 %start start_statement
 
@@ -41,10 +39,20 @@ start_statement:
 	}
 
 expr:
+    expr1 PLUS expr1
+    {
+        $$ = &Add{Left: $1, Right: $3}
+    }
+|   expr1
+    
+expr1:   
     DIGIT
     {
-    	fmt.Println($1)
         $$ = &LiteralInt{bytes: $1}
     }
+|   IDENT
+    {
+        $$ = &Variable{name: string($1)}
+    } 
 
 %%
