@@ -1,35 +1,24 @@
 package parser
 
 import (
-	"io"
+	"github.com/stretchr/testify/require"
 	"testing"
-	. "gopkg.in/check.v1"
 )
 
-func Test(t *testing.T) { TestingT(t) }
+func TestParse(t *testing.T) {
+	type testcase struct {
+		query  string
+		expect AST
+	}
 
-type MySuite struct{}
-
-var _ = Suite(&MySuite{})
-
-func (s *MySuite) TestHelloWorld(c *C) {
-	c.Assert(42, Equals, "42")
-	c.Assert(io.ErrClosedPipe, ErrorMatches, "io: .*on closed pipe")
-	c.Check(42, Equals, 42)
+	tests := []testcase{
+		{query: "1", expect: &LiteralInt{1}},
+	}
+	for _, tc := range tests {
+		t.Run(tc.query, func(t *testing.T) {
+			ast, err := Parse(tc.query)
+			require.NoError(t, err)
+			require.NotNil(t, ast)
+		})
+	}
 }
-
-
-//func TestParse(t *testing.T) {
-//	type testcase struct {
-//		query  string
-//		expect AST
-//	}
-//
-//	tests := []testcase{
-//		{query: "1", expect: &LiteralInt{1}},
-//	}
-//	for _, tc := range tests {
-//		ast, err := Parse(tc.query)
-//		require.N
-//	}
-//}
