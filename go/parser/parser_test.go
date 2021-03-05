@@ -10,10 +10,12 @@ func TestParse(t *testing.T) {
 		query  string
 		expect AST
 	}
-
+	yyDebug = 999
+	yyErrorVerbose = true
 	tests := []testcase{
-		{query: "1", expect: &LiteralInt{1}},
+		{query: "1", expect: &LiteralInt{bytes: []byte("1")}},
 	}
+
 	for _, tc := range tests {
 		t.Run(tc.query, func(t *testing.T) {
 			ast, err := Parse(tc.query)

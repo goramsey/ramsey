@@ -43,25 +43,25 @@ func (s *Scanner) Scan() (tok Token, lit string) {
 	// If we see whitespace then consume all contiguous whitespace.
 	// If we see a letter then consume as an ident or reserved word.
 	// If we see a digit then consume as a number.
-	if isWhitespace(ch) {
+	switch {
+	case isWhitespace(ch):
 		s.unread()
 		return s.scanWhitespace()
-	} else if isLetter(ch) {
+	case isLetter(ch):
 		s.unread()
 		return s.scanIdent()
-	}
-
-	// Otherwise read the individual character.
-	switch ch {
-	case eof:
+	case isDigit(ch):
+		s.unread()
+		return s.scanNumber()
+	case ch == eof:
 		return EOF, ""
-	case '*':
+	case ch == '*':
 		return ASTERISK, string(ch)
-	case ',':
+	case ch == ',':
 		return COMMA, string(ch)
+	default:
+		return ILLEGAL, string(ch)
 	}
-
-	return ILLEGAL, string(ch)
 }
 
 // scanWhitespace consumes the current rune and all contiguous whitespace.
@@ -84,6 +84,27 @@ func (s *Scanner) scanWhitespace() (tok Token, lit string) {
 	}
 
 	return WS, buf.String()
+}
+
+func (s *Scanner) scanNumber() (tok Token, lit string) {
+	// Create a buffer and read the current character into it.
+	var buf bytes.Buffer
+	buf.WriteRune(s.read())
+
+	// Read every subsequent ident character into the buffer.
+	// Non-ident characters and EOF will cause the loop to exit.
+	for {
+		if ch := s.read(); ch == eof {
+			break
+		} else if !isDigit(ch) {
+			s.unread()
+			break
+		} else {
+			_, _ = buf.WriteRune(ch)
+		}
+	}
+
+	return DIGIT, buf.String()
 }
 
 // scanIdent consumes the current rune and all contiguous ident runes.
@@ -135,7 +156,7 @@ func isWhitespace(ch rune) bool { return ch == ' ' || ch == '\t' || ch == '\n' }
 func isLetter(ch rune) bool { return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') }
 
 // isDigit returns true if the rune is a digit.
-func isDigit(ch rune) bool { return (ch >= '0' && ch <= '9') }
+func isDigit(ch rune) bool { return ch >= '0' && ch <= '9' }
 
 // eof represents a marker rune for the end of the reader.
 var eof = rune(0)

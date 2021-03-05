@@ -13,12 +13,15 @@ import "fmt"
 var regs = make([]int, 26)
 var base int
 
-//line cypher.y:14
+func setParseTree(yylex interface{}, result AST) {
+	yylex.(*Scanner).ast = result
+}
+
+//line cypher.y:18
 type yySymType struct {
 	yys   int
 	bytes []byte
-
-	val int
+	expr  Expr
 }
 
 const LEX_ERROR = 57346
@@ -31,7 +34,6 @@ const RETURN = 57352
 const WS = 57353
 const DIGIT = 57354
 const LETTER = 57355
-const UMINUS = 57356
 
 var yyToknames = [...]string{
 	"$end",
@@ -47,16 +49,6 @@ var yyToknames = [...]string{
 	"WS",
 	"DIGIT",
 	"LETTER",
-	"'|'",
-	"'&'",
-	"'+'",
-	"'-'",
-	"'*'",
-	"'/'",
-	"'%'",
-	"UMINUS",
-	"'\\n'",
-	"'='",
 }
 
 var yyStatenames = [...]string{}
@@ -65,8 +57,7 @@ const yyEofCode = 1
 const yyErrCode = 2
 const yyInitialStackSize = 16
 
-//line cypher.y:68
-/*  start  of  programs  */
+//line cypher.y:50
 
 //line yacctab:1
 var yyExca = [...]int{
@@ -77,59 +68,43 @@ var yyExca = [...]int{
 
 const yyPrivate = 57344
 
-const yyLast = 16
+const yyLast = 4
 
 var yyAct = [...]int{
-	8, 7, 6, 4, 6, 9, 3, 2, 1, 5,
-	0, 0, 0, 0, 0, 10,
+	3, 4, 1, 2,
 }
 
 var yyPact = [...]int{
-	-1000, -10, -21, -1000, -23, -7, -1000, -1000, -8, -1000,
-	-1000,
+	-12, -1000, -1000, -4, -1000,
 }
 
 var yyPgo = [...]int{
-	0, 6, 9, 8, 7,
+	0, 3, 2,
 }
 
 var yyR1 = [...]int{
-	0, 3, 3, 4, 4, 1, 2, 2,
+	0, 2, 1,
 }
 
 var yyR2 = [...]int{
-	0, 0, 3, 1, 3, 1, 1, 2,
+	0, 1, 2,
 }
 
 var yyChk = [...]int{
-	-1000, -3, -4, -1, 13, -2, 12, 22, 23, 12,
-	-1,
+	-1000, -2, -1, 12, 5,
 }
 
 var yyDef = [...]int{
-	1, -2, 0, 3, 0, 5, 6, 2, 0, 7,
-	4,
+	0, -2, 1, 0, 2,
 }
 
 var yyTok1 = [...]int{
-	1, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	22, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 3, 3, 3, 20, 15, 3,
-	3, 3, 18, 16, 3, 17, 3, 19, 3, 3,
-	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 23, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 3, 3, 14,
+	1,
 }
 
 var yyTok2 = [...]int{
 	2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
-	12, 13, 21,
+	12, 13,
 }
 
 var yyTok3 = [...]int{
@@ -473,34 +448,18 @@ yydefault:
 	// dummy call; replaced with literal code
 	switch yynt {
 
-	case 3:
+	case 1:
 		yyDollar = yyS[yypt-1 : yypt+1]
-//line cypher.y:43
+//line cypher.y:39
 		{
-			fmt.Printf("%d\n", yyDollar[1].val)
+			setParseTree(yylex, yyDollar[1].expr)
 		}
-	case 4:
-		yyDollar = yyS[yypt-3 : yypt+1]
-//line cypher.y:47
-		{
-			regs[yyDollar[1].val] = yyDollar[3].val
-		}
-	case 6:
-		yyDollar = yyS[yypt-1 : yypt+1]
-//line cypher.y:56
-		{
-			yyVAL.val = yyDollar[1].val
-			if yyDollar[1].val == 0 {
-				base = 8
-			} else {
-				base = 10
-			}
-		}
-	case 7:
+	case 2:
 		yyDollar = yyS[yypt-2 : yypt+1]
-//line cypher.y:65
+//line cypher.y:45
 		{
-			yyVAL.val = base*yyDollar[1].val + yyDollar[2].val
+			fmt.Println(yyDollar[1].bytes)
+			yyVAL.expr = &LiteralInt{bytes: yyDollar[1].bytes}
 		}
 	}
 	goto yystack /* stack new state and value */

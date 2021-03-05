@@ -78,8 +78,9 @@ func yyParsePooled(yylex yyLexer) int {
 // error is ignored and the DDL is returned anyway.
 func Parse(query string) (AST, error) {
 	tokenizer := NewScanner(strings.NewReader(query))
-	if yyParsePooled(tokenizer) != 0 {
-		return nil, fmt.Errorf("syntax error")
+	res := yyParse(tokenizer)
+	if res != 0 {
+		return nil, fmt.Errorf(tokenizer.err)
 	}
 	if tokenizer.ast == nil {
 		log.Printf("Empty Statement: %s", debug.Stack())

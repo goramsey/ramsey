@@ -1,95 +1,48 @@
 
 state 0
-	$accept: .list $end 
-	list: .    (1)
+	$accept: .start_statement $end 
 
-	.  reduce 1 (src line 38)
+	DIGIT  shift 3
+	.  error
 
-	list  goto 1
+	expr  goto 2
+	start_statement  goto 1
 
 state 1
-	$accept:  list.$end 
-	list:  list.stat '\n' 
+	$accept:  start_statement.$end 
 
 	$end  accept
-	DIGIT  shift 6
-	LETTER  shift 4
 	.  error
 
-	expr  goto 3
-	number  goto 5
-	stat  goto 2
 
 state 2
-	list:  list stat.'\n' 
+	start_statement:  expr.    (1)
 
-	'\n'  shift 7
-	.  error
+	.  reduce 1 (src line 37)
 
 
 state 3
-	stat:  expr.    (3)
+	expr:  DIGIT.EOF 
 
-	.  reduce 3 (src line 42)
+	EOF  shift 4
+	.  error
 
 
 state 4
-	stat:  LETTER.'=' expr 
+	expr:  DIGIT EOF.    (2)
 
-	'='  shift 8
-	.  error
-
-
-state 5
-	expr:  number.    (5)
-	number:  number.DIGIT 
-
-	DIGIT  shift 9
-	.  reduce 5 (src line 52)
+	.  reduce 2 (src line 43)
 
 
-state 6
-	number:  DIGIT.    (6)
-
-	.  reduce 6 (src line 55)
-
-
-state 7
-	list:  list stat '\n'.    (2)
-
-	.  reduce 2 (src line 39)
-
-
-state 8
-	stat:  LETTER '='.expr 
-
-	DIGIT  shift 6
-	.  error
-
-	expr  goto 10
-	number  goto 5
-
-state 9
-	number:  number DIGIT.    (7)
-
-	.  reduce 7 (src line 64)
-
-
-state 10
-	stat:  LETTER '=' expr.    (4)
-
-	.  reduce 4 (src line 46)
-
-
-23 terminals, 5 nonterminals
-8 grammar rules, 11/16000 states
+13 terminals, 3 nonterminals
+3 grammar rules, 5/16000 states
 0 shift/reduce, 0 reduce/reduce conflicts reported
-54 working sets used
-memory: parser 6/240000
+52 working sets used
+memory: parser 1/240000
 0 extra closures
-6 shift entries, 1 exceptions
-5 goto entries
-1 entries saved by goto default
-Optimizer space used: output 16/240000
-16 table entries, 5 zero
-maximum spread: 23, maximum offset: 23
+2 shift entries, 1 exceptions
+2 goto entries
+0 entries saved by goto default
+Optimizer space used: output 4/240000
+4 table entries, 0 zero
+maximum spread: 12, maximum offset: 12

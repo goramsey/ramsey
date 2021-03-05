@@ -13,6 +13,7 @@ type (
 	}
 
 	LiteralInt struct {
+		bytes []byte
 		val int
 	}
 )
